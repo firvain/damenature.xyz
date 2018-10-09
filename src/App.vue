@@ -1,29 +1,59 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <v-app dark>
+
+    <v-toolbar  app absolute clipped-left>
+      <v-toolbar-title v-text="title"></v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon  to="/">
+        <v-icon color="purple darken-2">home</v-icon>
+      </v-btn>
+      <v-btn icon v-if="!authenticated" @click="login()">
+        <v-icon color="red darken-2">account_circle</v-icon>
+      </v-btn>
+        <v-btn icon  v-if="authenticated" @click="logout()">
+        <v-icon color="green darken-2">account_circle</v-icon>
+      </v-btn>
+       <v-btn icon to="about">
+        <v-icon   color="blue darken-2">info</v-icon>
+      </v-btn>
+    </v-toolbar>
+    <v-content>
+      <router-view
+        :auth="auth"
+        :authenticated="authenticated">
+      >
+      </router-view>
+    </v-content>
+    <v-footer :fixed="fixed" app>
+      <span>&copy; Terra Cognita 2018</span>
+    </v-footer>
+  </v-app>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
+<script>
+import AuthService from './auth/AuthService';
+
+const auth = new AuthService();
+const {
+  login, logout, authenticated, authNotifier,
+} = auth;
+
+export default {
+  name: 'App',
+  data() {
+    authNotifier.on('authChange', (authState) => {
+      this.authenticated = authState.authenticated;
+    });
+    return {
+      fixed: false,
+      title: 'DameNature.xyz',
+      auth,
+      authenticated,
+    };
+  },
+  methods: {
+    login,
+    logout,
+  },
+};
+</script>
